@@ -11,7 +11,7 @@ def main():
     datafolder_icbeb = '../data/ICBEB/'
     outputfolder = '../output/'
 
-    conf_my_dsc_xresnet1d101 = {'modelname':'fastai_my_dsc_xresnet1d101', 'modeltype':'fastai_model', 
+    conf_my_dsc_xresnet1d101 = {'modelname':'fastai_dsc_xresnet1d101', 'modeltype':'fastai_model', 
     'parameters':dict()}
     models = [
             conf_my_dsc_xresnet1d101
