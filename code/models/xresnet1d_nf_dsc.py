@@ -259,9 +259,12 @@ class XResNet1d(nn.Sequential):
         stem_szs = [input_channels, *stem_szs]
         # stem = [ConvLayer(stem_szs[i], stem_szs[i+1], ks=kernel_size_stem, stride=2 if i==0 else 1, act_cls=act_cls, ndim=1)
         #         for i in range(3)]
-        stem = [DSConvLayer(stem_szs[0], stem_szs[1], ks=50, stride=2, act_cls=act_cls, ndim=1),
-                DSConvLayer(stem_szs[1], stem_szs[2], ks=15, stride=1, act_cls=act_cls, ndim=1),
-                DSConvLayer(stem_szs[2], stem_szs[3], ks=kernel_size_stem, stride=1, act_cls=act_cls, ndim=1)]
+        stem = [DSConvLayer(stem_szs[0], stem_szs[3], ks=50, stride=2, act_cls=act_cls, ndim=1),
+                DSConvLayer(stem_szs[3], stem_szs[3], ks=15, stride=1, act_cls=act_cls, ndim=1),
+                DSConvLayer(stem_szs[3], stem_szs[3], ks=kernel_size_stem, stride=1, act_cls=act_cls, ndim=1),
+                DSConvLayer(stem_szs[3], stem_szs[3], ks=kernel_size_stem, stride=1, act_cls=act_cls, ndim=1),
+                DSConvLayer(stem_szs[3], stem_szs[3], ks=kernel_size_stem, stride=1, act_cls=act_cls, ndim=1)
+                ]
         #block_szs = [int(o*widen) for o in [64,128,256,512] +[256]*(len(layers)-4)]
         block_szs = [int(o*widen) for o in [64,64,64,64] +[32]*(len(layers)-4)]
         block_szs = [64//expansion] + block_szs

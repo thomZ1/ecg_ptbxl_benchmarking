@@ -13,8 +13,11 @@ def main():
 
     conf_my_dsc_xresnet1d101 = {'modelname':'fastai_dsc_xresnet1d101', 'modeltype':'fastai_model', 
     'parameters':dict()}
+    conf_my_dsc_se_xresnet1d101 = {'modelname':'fastai_dsc_se_xresnet1d101', 'modeltype':'fastai_model', 
+    'parameters':dict()}
     models = [
-            conf_my_dsc_xresnet1d101
+            conf_my_dsc_xresnet1d101,
+            conf_my_dsc_se_xresnet1d101
         ]
 
     ##########################################
