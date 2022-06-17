@@ -23,11 +23,11 @@ def main():
 
     experiments = [
         ('exp0', 'all'),
-        ('exp1', 'diagnostic'),
-        ('exp1.1', 'subdiagnostic'),
-        ('exp1.1.1', 'superdiagnostic'),
-        ('exp2', 'form'),
-        ('exp3', 'rhythm')
+        # ('exp1', 'diagnostic'),
+        # ('exp1.1', 'subdiagnostic'),
+        # ('exp1.1.1', 'superdiagnostic'),
+        # ('exp2', 'form'),
+        # ('exp3', 'rhythm')
        ]
 
     for name, task in experiments:

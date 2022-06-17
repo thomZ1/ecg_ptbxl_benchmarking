@@ -85,6 +85,11 @@ def store_attr(self, nms):
 
 NormType = Enum('NormType', 'Batch BatchZero Weight Spectral Instance InstanceZero')
 
+def _conv_func(ndim=2, transpose=False):
+    "Return the proper conv `ndim` function, potentially `transposed`."
+    assert 1 <= ndim <=3
+    return getattr(nn, f'Conv{"Transpose" if transpose else ""}{ndim}d')
+
 def init_default(m, func=nn.init.kaiming_normal_):
     "Initialize `m` weights with `func` and set `bias` to 0."
     if func and hasattr(m, 'weight'): func(m.weight)
@@ -105,8 +110,27 @@ def BatchNorm(nf, ndim=2, norm_type=NormType.Batch, **kwargs):
     "BatchNorm layer with `nf` features and `ndim` initialized depending on `norm_type`."
     return _get_norm('BatchNorm', nf, ndim, zero=norm_type==NormType.BatchZero, **kwargs)
 
+# se
+class SEModule(nn.Module):
+    def __init__(self, in_size, reduction=4, act_cls = None):
+        super(SEModule, self).__init__()
+        if act_cls is None :
+            act_cls = nn.ReLU
+        self.se = nn.Sequential(
+            nn.AdaptiveAvgPool1d(1),
+            nn.Conv1d(in_size, in_size // reduction, kernel_size=1, stride=1, padding=0, bias=False),
+            nn.BatchNorm1d(in_size // reduction),
+ 
+            act_cls(in_size//reduction),
+            nn.Conv1d(in_size // reduction, in_size, kernel_size=1, stride=1, padding=0, bias=False),
+            nn.BatchNorm1d(in_size),
+            act_cls(in_size)
+        )
+ 
+    def forward(self, x):
+        return x * self.se(x)
 
-##  replace by DSC
+##  DSC
 class DSconv1d(nn.Module):
     def __init__(self,in_ch,out_ch,kernel_size=50,bias=True ,padding= 1,stride =1,**kwargs):
         super(DSconv1d, self).__init__()
@@ -130,7 +154,7 @@ class DSconv1d(nn.Module):
         out = self.point_conv(out)
         return out
 
-class ConvLayer(nn.Sequential):
+class DSConvLayer(nn.Sequential):
     "Create a sequence of convolutional (`ni` to `nf`), ReLU (if `use_activ`) and `norm_type` layers."
     def __init__(self, ni, nf, ks=3, stride=1, padding=None, bias=None, ndim=2, norm_type=NormType.Batch, bn_1st=True,
                  act_cls=nn.ReLU, transpose=False, init=nn.init.kaiming_normal_, xtra=None, **kwargs):
@@ -139,6 +163,28 @@ class ConvLayer(nn.Sequential):
         inn = norm_type in (NormType.Instance, NormType.InstanceZero)
         if bias is None: bias = not (bn or inn)
         conv = init_default(DSconv1d(ni, nf, kernel_size=ks, bias=bias, stride=stride, padding=padding, **kwargs), init)
+        if   norm_type==NormType.Weight:   conv = weight_norm(conv)
+        elif norm_type==NormType.Spectral: conv = spectral_norm(conv)
+        layers = [conv]
+        act_bn = []
+        if act_cls is not None: act_bn.append(act_cls())
+        if bn: act_bn.append(BatchNorm(nf, norm_type=norm_type, ndim=ndim))
+        if inn: act_bn.append(InstanceNorm(nf, norm_type=norm_type, ndim=ndim))
+        if bn_1st: act_bn.reverse()
+        layers += act_bn
+        if xtra: layers.append(xtra)
+        super().__init__(*layers)
+
+class ConvLayer(nn.Sequential):
+    "Create a sequence of convolutional (`ni` to `nf`), ReLU (if `use_activ`) and `norm_type` layers."
+    def __init__(self, ni, nf, ks=3, stride=1, padding=None, bias=None, ndim=2, norm_type=NormType.Batch, bn_1st=True,
+                 act_cls=nn.ReLU, transpose=False, init=nn.init.kaiming_normal_, xtra=None, **kwargs):
+        if padding is None: padding = ((ks-1)//2 if not transpose else 0)
+        bn = norm_type in (NormType.Batch, NormType.BatchZero)
+        inn = norm_type in (NormType.Instance, NormType.InstanceZero)
+        if bias is None: bias = not (bn or inn)
+        conv_func = _conv_func(ndim, transpose=transpose)
+        conv = init_default(conv_func(ni, nf, kernel_size=ks, bias=bias, stride=stride, padding=padding, **kwargs), init)
         if   norm_type==NormType.Weight:   conv = weight_norm(conv)
         elif norm_type==NormType.Spectral: conv = spectral_norm(conv)
         layers = [conv]
@@ -213,9 +259,9 @@ class XResNet1d(nn.Sequential):
         stem_szs = [input_channels, *stem_szs]
         # stem = [ConvLayer(stem_szs[i], stem_szs[i+1], ks=kernel_size_stem, stride=2 if i==0 else 1, act_cls=act_cls, ndim=1)
         #         for i in range(3)]
-        stem = [ConvLayer(stem_szs[0], stem_szs[1], ks=50, stride=2, act_cls=act_cls, ndim=1),
-                ConvLayer(stem_szs[1], stem_szs[2], ks=15, stride=1, act_cls=act_cls, ndim=1),
-                ConvLayer(stem_szs[2], stem_szs[3], ks=kernel_size_stem, stride=1, act_cls=act_cls, ndim=1)]
+        stem = [DSConvLayer(stem_szs[0], stem_szs[1], ks=50, stride=2, act_cls=act_cls, ndim=1),
+                DSConvLayer(stem_szs[1], stem_szs[2], ks=15, stride=1, act_cls=act_cls, ndim=1),
+                DSConvLayer(stem_szs[2], stem_szs[3], ks=kernel_size_stem, stride=1, act_cls=act_cls, ndim=1)]
         #block_szs = [int(o*widen) for o in [64,128,256,512] +[256]*(len(layers)-4)]
         block_szs = [int(o*widen) for o in [64,64,64,64] +[32]*(len(layers)-4)]
         block_szs = [64//expansion] + block_szs
@@ -264,7 +310,7 @@ def dsc_xresnet1d18_deeper(**kwargs): return _xresnet1d(1, [2,2,1,1,1,1,1,1], **
 def dsc_xresnet1d34_deeper(**kwargs): return _xresnet1d(1, [3,4,6,3,1,1,1,1], **kwargs)
 def xresnet1d50_deeper(**kwargs): return _xresnet1d(4, [3,4,6,3,1,1,1,1], **kwargs)
 
-model = dsc_xresnet1d34(num_classes=71,input_channels=12,kernel_size=5,ps_head=0.5,lin_ftrs_head=[128])
-n_parameters = sum(p.numel() for p in model.parameters() if p.requires_grad)
-print(n_parameters)
-print(model)
+# model = dsc_xresnet1d34(num_classes=71,input_channels=12,kernel_size=5,ps_head=0.5,lin_ftrs_head=[128])
+# n_parameters = sum(p.numel() for p in model.parameters() if p.requires_grad)
+# print(n_parameters)
+# print(model)

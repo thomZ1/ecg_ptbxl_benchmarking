@@ -421,8 +421,8 @@ def ICBEBE_table(selection=None, folder='../output/'):
         me_res = pd.read_csv(folder+'exp_ICBEB/models/'+model+'/results/te_results.csv', index_col=0)
         mcol=[]
         for col in cols:
-            mean = me_res.ix['point'][col]
-            unc = max(me_res.ix['upper'][col]-me_res.ix['point'][col], me_res.ix['point'][col]-me_res.ix['lower'][col])
+            mean = me_res.loc['point'][col]
+            unc = max(me_res.loc['upper'][col]-me_res.loc['point'][col], me_res.loc['point'][col]-me_res.loc['lower'][col])
             mcol.append("%.3f(%.2d)" %(np.round(mean,3), int(unc*1000)))
         data.append(mcol)
     data = np.array(data)
