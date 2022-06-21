@@ -259,13 +259,13 @@ class XResNet1d(nn.Sequential):
         stem_szs = [input_channels, *stem_szs]
         # stem = [ConvLayer(stem_szs[i], stem_szs[i+1], ks=kernel_size_stem, stride=2 if i==0 else 1, act_cls=act_cls, ndim=1)
         #         for i in range(3)]
-        stem = [ConvLayer(stem_szs[0], 64, ks=kernel_size_stem, stride=2, act_cls=act_cls, ndim=1),
-                ConvLayer(64, 64, ks=kernel_size_stem, stride=1, act_cls=act_cls, ndim=1),
-                ConvLayer(64, 64, ks=kernel_size_stem, stride=1, act_cls=act_cls, ndim=1),
+        stem = [ConvLayer(stem_szs[0], 128, ks=kernel_size_stem, stride=2, act_cls=act_cls, ndim=1),
+                ConvLayer(128, 128, ks=kernel_size_stem, stride=1, act_cls=act_cls, ndim=1),
+                ConvLayer(128, 128, ks=kernel_size_stem, stride=1, act_cls=act_cls, ndim=1),
                 ]
-        block_szs = [int(o*widen) for o in [64,128,256,256] +[256]*(len(layers)-4)]
+        block_szs = [int(o*widen) for o in [128,128,128,128] +[128]*(len(layers)-4)]
         # block_szs = [int(o*widen) for o in [64,64,64,64] +[32]*(len(layers)-4)]
-        block_szs = [64//expansion] + block_szs
+        block_szs = [128//expansion] + block_szs
         blocks = [self._make_layer(ni=block_szs[i], nf=block_szs[i+1], blocks=l,
                                    stride=1 if i==0 else 2, kernel_size=kernel_size, sa=sa and i==len(layers)-4, ndim=1, **kwargs)
                   for i,l in enumerate(layers)]
