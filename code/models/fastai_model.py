@@ -351,6 +351,9 @@ class fastai_model(ClassificationModel):
         elif(self.name.startswith("fastai_xception")):
             from models.xception import xception
             model = xception(num_classes=num_classes,input_channels=self.input_channels)
+        elif(self.name.startswith("fastai_se_resnext101")):
+            from models.seresnet import se_resnext101
+            model = se_resnext101(num_classes =num_classes)
 
         #xresnet ... (order important for string capture)
         elif(self.name.startswith("fastai_xresnet1d18_deeper")):

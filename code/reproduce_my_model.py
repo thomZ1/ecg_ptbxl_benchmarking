@@ -15,7 +15,11 @@ def main():
     'parameters':dict()}
     conf_fastai_xception = {'modelname':'fastai_xception', 'modeltype':'fastai_model', 
     'parameters':dict()}
+    fastai_se_resnext101 = {'modelname':'fastai_se_resnext101', 'modeltype':'fastai_model', 
+    'parameters':dict()}
+    
     models = [
+            fastai_se_resnext101,
             conf_fastai_xception,
             conf_my_dsc_xresnet1d101,
             
