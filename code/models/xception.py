@@ -126,14 +126,12 @@ class Xception(nn.Module):
         self.num_classes = num_classes#总分类数
 
         ################################## 定义 Entry flow ###############################################################
-        self.conv1 = nn.Conv1d(in_channels=12, out_channels=64, kernel_size=64,stride=3,padding=0,bias=False)
-        self.bn1 = nn.BatchNorm1d(64)
+        self.conv1 = nn.Conv1d(in_channels=input_channels, out_channels=32, kernel_size=3,stride=2,padding=0,bias=False)
+        self.bn1 = nn.BatchNorm1d(32)
         self.relu = nn.ReLU(inplace=True)
 
-        self.conv2 = nn.Conv1d(in_channels=64,out_channels=64, kernel_size=32,stride=2,padding=0,bias=False)
+        self.conv2 = nn.Conv1d(in_channels=32,out_channels=64, kernel_size=3,stride=1,padding=0,bias=False)
         self.bn2 = nn.BatchNorm1d(64)
-        self.conv3 = nn.Conv1d(in_channels=64,out_channels=64, kernel_size=32,stride=1,padding=0,bias=False)
-        self.bn3 = nn.BatchNorm1d(64)
         #do relu here
 
         # Block中的参数顺序：in_filters,out_filters,reps,stride,start_with_relu,grow_first
@@ -157,12 +155,12 @@ class Xception(nn.Module):
         #################################### 定义 Exit flow ###############################################################
         self.block12=Block(728,1024,2,2,start_with_relu=True,grow_first=False)
 
-        self.conv4 = SeparableConv1d(1024,1536,3,1,1)
-        self.bn4 = nn.BatchNorm1d(1536)
+        self.conv3 = SeparableConv1d(1024,1536,3,1,1)
+        self.bn3 = nn.BatchNorm1d(1536)
 
         #do relu here
-        self.conv5 = SeparableConv1d(1536,2048,3,1,1)
-        self.bn5 = nn.BatchNorm1d(2048)
+        self.conv4 = SeparableConv1d(1536,2048,3,1,1)
+        self.bn4 = nn.BatchNorm1d(2048)
         
         self.fc = nn.Linear(2048, num_classes)
         self.head = create_head1d(2048, nc=num_classes, lin_ftrs=[128], ps=0.5, bn_final=False, bn=True, act='relu', concat_pooling=True)
@@ -196,10 +194,6 @@ class Xception(nn.Module):
         x = self.bn2(x)
         x = self.relu(x)
 
-        x = self.conv3(x)
-        x = self.bn3(x)
-        x = self.relu(x) 
-
         x = self.block1(x)
         x = self.block2(x)
         x = self.block3(x)
@@ -217,12 +211,12 @@ class Xception(nn.Module):
         #################################### 定义 Exit flow ###############################################################
         x = self.block12(x)
         
-        x = self.conv4(x)
-        x = self.bn4(x)
+        x = self.conv3(x)
+        x = self.bn3(x)
         x = self.relu(x)
         
-        x = self.conv5(x)
-        x = self.bn5(x)
+        x = self.conv4(x)
+        x = self.bn4(x)
         x = self.relu(x)
 
         # x = F.adaptive_avg_pool1d(x, 1)
