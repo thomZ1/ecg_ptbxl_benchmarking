@@ -347,10 +347,10 @@ class fastai_model(ClassificationModel):
             model = dsc_xresnet1d101(num_classes=num_classes,input_channels=self.input_channels,kernel_size=self.kernel_size,ps_head=self.ps_head,lin_ftrs_head=self.lin_ftrs_head)
         elif(self.name.startswith("fastai_dsc_se_xresnet1d101")):
             from models.xresnet1d_nf_dsc import dsc_xresnet1d101
-            model = dsc_xresnet1d101(num_classes=num_classes,input_channels=self.input_channels,kernel_size=self.kernel_size,ps_head=self.ps_head,lin_ftrs_head=self.lin_ftrs_head,reduction = 16)
+            model = dsc_xresnet1d101(num_classes=num_classes,input_channels=self.input_channels,kernel_size=self.kernel_size,ps_head=self.ps_head,lin_ftrs_head=self.lin_ftrs_head,reduction = 4)
         elif(self.name.startswith("fastai_xception")):
             from models.xception import xception
-            model = xception(num_classes=31,input_channels=12)
+            model = xception(num_classes=num_classes,input_channels=self.input_channels)
 
         #xresnet ... (order important for string capture)
         elif(self.name.startswith("fastai_xresnet1d18_deeper")):
