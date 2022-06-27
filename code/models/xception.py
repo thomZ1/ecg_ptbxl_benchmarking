@@ -121,7 +121,7 @@ class Block(nn.Module):
         x+=skip
         return x
 class Xception(nn.Module):
-    def __init__(self, num_classes=1000,input_channels = 12):
+    def __init__(self, num_classes=1000,input_channels=12, ps_head=0.5,lin_ftrs_head=[128]):
         super(Xception, self).__init__()
         self.num_classes = num_classes#总分类数
 
@@ -163,7 +163,7 @@ class Xception(nn.Module):
         self.bn4 = nn.BatchNorm1d(2048)
         
         self.fc = nn.Linear(2048, num_classes)
-        self.head = create_head1d(2048, nc=num_classes, lin_ftrs=[128], ps=0.5, bn_final=False, bn=True, act='relu', concat_pooling=True)
+        self.head = create_head1d(2048, nc=num_classes, lin_ftrs= lin_ftrs_head, ps= ps_head, bn_final=False, bn=True, act='relu', concat_pooling=True)
         #256 71 [128] 0.5 False  True 'relu' True
 
         ###################################################################################################################
@@ -227,3 +227,9 @@ class Xception(nn.Module):
 
 
 def xception(**kwargs): return Xception( **kwargs)
+
+
+model = xception(num_classes =71)
+model.eval()
+from torchsummary import summary
+summary(model, input_size=[(12 ,5000)], batch_size=1, device="cpu")

@@ -11,18 +11,29 @@ def main():
     datafolder_icbeb = '../data/ICBEB/'
     outputfolder = '../output/'
 
-    conf_my_dsc_xresnet1d101 = {'modelname':'fastai_dsc_xresnet1d101', 'modeltype':'fastai_model', 
+    # conf_my_dsc_xresnet1d101 = {'modelname':'fastai_dsc_xresnet1d101', 'modeltype':'fastai_model', 
+    # 'parameters':dict()}
+    # conf_fastai_xception = {'modelname':'fastai_xception', 'modeltype':'fastai_model', 
+    # 'parameters':dict()}
+    # conf_fastai_se_resnext101 = {'modelname':'fastai_se_resnext101', 'modeltype':'fastai_model', 
+    # 'parameters':dict()}
+    conf_fastai_se_resnet101 = {'modelname':'fastai_se_resnet101', 'modeltype':'fastai_model', 
     'parameters':dict()}
-    conf_fastai_xception = {'modelname':'fastai_xception', 'modeltype':'fastai_model', 
+    conf_fastai_se_resnext101_s2 = {'modelname':'fastai_se_resnext101_s2', 'modeltype':'fastai_model', 
     'parameters':dict()}
-    fastai_se_resnext101 = {'modelname':'fastai_se_resnext101', 'modeltype':'fastai_model', 
+    conf_fastai_se_resnet101_s2 = {'modelname':'fastai_se_resnet101_s2', 'modeltype':'fastai_model', 
     'parameters':dict()}
-    
+    conf_fastai_se_resnext101_h = {'modelname':'fastai_se_resnext101_h', 'modeltype':'fastai_model', 
+    'parameters':dict()}
+    conf_fastai_se_resnet101_h = {'modelname':'fastai_se_resnet101_h', 'modeltype':'fastai_model', 
+    'parameters':dict()}
     models = [
-            fastai_se_resnext101,
-            conf_fastai_xception,
-            conf_my_dsc_xresnet1d101,
-            
+            conf_fastai_se_resnet101,
+            conf_fastai_se_resnext101_s2,
+            conf_fastai_se_resnet101_s2,
+            conf_fastai_se_resnext101_h,
+            conf_fastai_se_resnet101_h,
+
         ]
 
     ##########################################

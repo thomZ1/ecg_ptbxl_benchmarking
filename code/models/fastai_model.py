@@ -341,20 +341,37 @@ class fastai_model(ClassificationModel):
             model = resnet1d_wang(num_classes=num_classes,input_channels=self.input_channels,kernel_size=self.kernel_size,ps_head=self.ps_head,lin_ftrs_head=self.lin_ftrs_head)
         elif(self.name.startswith("fastai_wrn1d_22")):    
             model = wrn1d_22(num_classes=num_classes,input_channels=self.input_channels,kernel_size=self.kernel_size,ps_head=self.ps_head,lin_ftrs_head=self.lin_ftrs_head)
+        
         #dsc_xresnet ... (order important for string capture)
         elif(self.name.startswith("fastai_dsc_xresnet1d101")):
             from models.xresnet1d_nf_dsc import dsc_xresnet1d101
             model = dsc_xresnet1d101(num_classes=num_classes,input_channels=self.input_channels,kernel_size=self.kernel_size,ps_head=self.ps_head,lin_ftrs_head=self.lin_ftrs_head)
-        elif(self.name.startswith("fastai_dsc_se_xresnet1d101")):
-            from models.xresnet1d_nf_dsc import dsc_xresnet1d101
-            model = dsc_xresnet1d101(num_classes=num_classes,input_channels=self.input_channels,kernel_size=self.kernel_size,ps_head=self.ps_head,lin_ftrs_head=self.lin_ftrs_head,reduction = 4)
+
         elif(self.name.startswith("fastai_xception")):
             from models.xception import xception
             model = xception(num_classes=num_classes,input_channels=self.input_channels)
+
         elif(self.name.startswith("fastai_se_resnext101")):
             from models.seresnet import se_resnext101
             model = se_resnext101(num_classes =num_classes)
+        elif(self.name.startswith("fastai_se_resnext101_s2")):
+            from models.seresnet import se_resnext101
+            model = se_resnext101(num_classes =num_classes, stride = 2)
+        elif(self.name.startswith("fastai_se_resnext101_h")):
+            from models.seresnet import se_resnext101
+            model = se_resnext101(num_classes =num_classes,se_header = False)
 
+        elif(self.name.startswith("fastai_se_resnet101")):
+            from models.seresnet import se_resnet101
+            model = se_resnet101(num_classes =num_classes)
+        elif(self.name.startswith("fastai_se_resnet101_s2")):
+            from models.seresnet import se_resnet101
+            model = se_resnet101(num_classes =num_classes, stride = 2)
+        elif(self.name.startswith("fastai_se_resnet101_h")):
+            from models.seresnet import se_resnet101
+            model = se_resnet101(num_classes =num_classes,se_header = False)
+
+            
         #xresnet ... (order important for string capture)
         elif(self.name.startswith("fastai_xresnet1d18_deeper")):
             model = xresnet1d18_deeper(num_classes=num_classes,input_channels=self.input_channels,kernel_size=self.kernel_size,ps_head=self.ps_head,lin_ftrs_head=self.lin_ftrs_head)
