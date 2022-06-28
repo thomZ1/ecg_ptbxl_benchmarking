@@ -11,5 +11,7 @@ __pycache__
 **/*.pyc
 **/*.fls
 **/*.fdb_latexmk
-
+/data
+/output
+/.vscode
 .ipynb_checkpoints

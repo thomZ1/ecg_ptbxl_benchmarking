@@ -229,7 +229,7 @@ class Xception(nn.Module):
 def xception(**kwargs): return Xception( **kwargs)
 
 
-model = xception(num_classes =71)
-model.eval()
-from torchsummary import summary
-summary(model, input_size=[(12 ,5000)], batch_size=1, device="cpu")
+# model = xception(num_classes =71)
+# model.eval()
+# from torchsummary import summary
+# summary(model, input_size=[(12 ,5000)], batch_size=1, device="cpu")
